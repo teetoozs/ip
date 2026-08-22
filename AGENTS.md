@@ -35,5 +35,5 @@ Use the project-specific `seedu-java-coding-standard` skill for all Java code cr
 ## Git
 
 Use lightweight tags unless the user requests an annotated tag.
-When proposing or creating a commit message, include enough detail to explain the rationale for the change.
+Use the project-specific `seedu-git-standard` skill whenever proposing or creating commit messages, naming branches, or reviewing Git history.
 Do not commit or push unless explicitly asked.

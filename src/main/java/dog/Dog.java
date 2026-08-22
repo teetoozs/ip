@@ -1,9 +1,18 @@
+package dog;
+
 import java.util.Scanner;
 
-/** Entry point for the Dog chatbot. */
+/**
+ * Runs the Dog chatbot and handles commands entered by the user.
+ */
 public class Dog {
     private static final int MAX_TASKS = 100;
 
+    /**
+     * Starts the chatbot and processes commands until the user exits.
+     *
+     * @param args Command-line arguments supplied to the program.
+     */
     public static void main(String[] args) {
         String banner = " ____              \n"
                 + "|  _ \\  ___   __ _ \n"
@@ -44,7 +53,7 @@ public class Dog {
             String commandWord = commandParts[0];
             if (commandWord.equalsIgnoreCase("mark") || commandWord.equalsIgnoreCase("unmark")) {
                 if (commandParts.length < 2) {
-                    System.out.println("Please provide a number within the list range"
+                    System.out.println("Please provide a task number, for example: "
                             + commandWord.toLowerCase() + " 1");
                     continue;
                 }
@@ -54,7 +63,6 @@ public class Dog {
                     taskIndex = Integer.parseInt(commandParts[1]) - 1;
                 } catch (NumberFormatException e) {
                     System.out.println("Please provide a valid task number.");
-                    //agn guarding from ai improvements
                     continue;
                 }
 
@@ -76,7 +84,6 @@ public class Dog {
             }
 
             if (taskCount == MAX_TASKS) {
-                //improvements to guard against >100 inputs
                 System.out.println("I cannot store more than " + MAX_TASKS + " tasks.");
                 continue;
             }
@@ -87,5 +94,4 @@ public class Dog {
         }
         scanner.close();
     }
-
 }

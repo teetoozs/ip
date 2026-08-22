@@ -15,8 +15,7 @@ public class Dog {
         System.out.println("Woof! What can I do for you today?");
 
         Scanner scanner = new Scanner(System.in);
-        String[] tasks = new String[MAX_TASKS];
-        boolean[] isDone = new boolean[MAX_TASKS];
+        Task[] tasks = new Task[MAX_TASKS];
         int taskCount = 0;
 
         while (true) {
@@ -35,8 +34,7 @@ public class Dog {
                 } else {
                     System.out.println("Woof list:");
                     for (int i = 0; i < taskCount; i++) {
-                        String status = isDone[i] ? "X" : " ";
-                        System.out.println((i + 1) + ".[" + status + "] " + tasks[i]);
+                        System.out.println((i + 1) + "." + tasks[i]);
                     }
                 }
                 continue;
@@ -65,11 +63,15 @@ public class Dog {
                     continue;
                 }
 
-                isDone[taskIndex] = commandWord.equalsIgnoreCase("mark");
-                String status = isDone[taskIndex] ? "X" : " ";
-                String action = isDone[taskIndex] ? "marked as done" : "marked as not done";
+                boolean shouldMarkAsDone = commandWord.equalsIgnoreCase("mark");
+                if (shouldMarkAsDone) {
+                    tasks[taskIndex].markAsDone();
+                } else {
+                    tasks[taskIndex].markAsNotDone();
+                }
+                String action = shouldMarkAsDone ? "marked as done" : "marked as not done";
                 System.out.println("Task " + (taskIndex + 1) + " has been " + action + ":");
-                System.out.println("[" + status + "] " + tasks[taskIndex]);
+                System.out.println(tasks[taskIndex]);
                 continue;
             }
 
@@ -79,7 +81,7 @@ public class Dog {
                 continue;
             }
 
-            tasks[taskCount] = input;
+            tasks[taskCount] = new Task(input);
             taskCount++;
             System.out.println("Added: " + input);
         }

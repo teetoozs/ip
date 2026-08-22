@@ -15,16 +15,13 @@ public class Dog {
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.print("> ");
-            String command = scanner.nextLine().trim();
+            String input = scanner.nextLine();
 
-            if (command.equalsIgnoreCase("bye")) {
+            if (input.trim().equalsIgnoreCase("bye")) {
                 System.out.println("Woof! See you again!");
                 break;
-            } else if (command.equalsIgnoreCase("bark")) {
-                System.out.println("WOOF WOOF!");
-            } else {
-                System.out.println("You said: " + command);
             }
+            System.out.println(input);
         }
         scanner.close();
     }

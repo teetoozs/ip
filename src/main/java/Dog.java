@@ -16,6 +16,7 @@ public class Dog {
 
         Scanner scanner = new Scanner(System.in);
         String[] tasks = new String[MAX_TASKS];
+        boolean[] isDone = new boolean[MAX_TASKS];
         int taskCount = 0;
 
         while (true) {
@@ -34,9 +35,41 @@ public class Dog {
                 } else {
                     System.out.println("Woof list:");
                     for (int i = 0; i < taskCount; i++) {
-                        System.out.println((i + 1) + ". " + tasks[i]);
+                        String status = isDone[i] ? "X" : " ";
+                        System.out.println((i + 1) + ".[" + status + "] " + tasks[i]);
                     }
                 }
+                continue;
+            }
+
+            String[] commandParts = command.split("\\s+", 2);
+            String commandWord = commandParts[0];
+            if (commandWord.equalsIgnoreCase("mark") || commandWord.equalsIgnoreCase("unmark")) {
+                if (commandParts.length < 2) {
+                    System.out.println("Please provide a number within the list range"
+                            + commandWord.toLowerCase() + " 1");
+                    continue;
+                }
+
+                int taskIndex;
+                try {
+                    taskIndex = Integer.parseInt(commandParts[1]) - 1;
+                } catch (NumberFormatException e) {
+                    System.out.println("Please provide a valid task number.");
+                    //agn guarding from ai improvements
+                    continue;
+                }
+
+                if (taskIndex < 0 || taskIndex >= taskCount) {
+                    System.out.println("That task number does not exist.");
+                    continue;
+                }
+
+                isDone[taskIndex] = commandWord.equalsIgnoreCase("mark");
+                String status = isDone[taskIndex] ? "X" : " ";
+                String action = isDone[taskIndex] ? "marked as done" : "marked as not done";
+                System.out.println("Task " + (taskIndex + 1) + " has been " + action + ":");
+                System.out.println("[" + status + "] " + tasks[taskIndex]);
                 continue;
             }
 

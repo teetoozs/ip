@@ -8,6 +8,8 @@ import java.util.Scanner;
 public class Dog {
     private static final int MAX_TASKS = 100;
     private static final String DIVIDER = "____________________________________________________________";
+    private static final String DEADLINE_USAGE = "Usage: deadline <description> /by <date/time>";
+    private static final String EVENT_USAGE = "Usage: event <description> /from <start> /to <end>";
 
     /**
      * Starts the chatbot and processes commands until the user exits.
@@ -149,25 +151,41 @@ public class Dog {
         }
 
         if (commandWord.equalsIgnoreCase("deadline")) {
-            String[] parts = arguments.split("\\s+/by\\s+", 2);
-            if (parts.length != 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
-                throw new IllegalArgumentException("Usage: deadline <description> /by <date/time>");
-            }
-            return new Deadline(parts[0].trim(), parts[1].trim());
+            return createDeadline(arguments);
         }
 
         if (commandWord.equalsIgnoreCase("event")) {
-            String[] parts = arguments.split("\\s+/from\\s+", 2);
-            if (parts.length != 2 || parts[0].trim().isEmpty()) {
-                throw new IllegalArgumentException("Usage: event <description> /from <start> /to <end>");
-            }
-            String[] times = parts[1].split("\\s+/to\\s+", 2);
-            if (times.length != 2 || times[0].trim().isEmpty() || times[1].trim().isEmpty()) {
-                throw new IllegalArgumentException("Usage: event <description> /from <start> /to <end>");
-            }
-            return new Event(parts[0].trim(), times[0].trim(), times[1].trim());
+            return createEvent(arguments);
         }
 
         throw new IllegalArgumentException("Unknown command. Use todo, deadline, event, list, mark, unmark, or bye.");
+    }
+
+    private static Task createDeadline(String arguments) {
+        String[] deadlineFields = splitRequiredFields(arguments, "\\s+/by\\s+", DEADLINE_USAGE);
+        return new Deadline(deadlineFields[0], deadlineFields[1]);
+    }
+
+    private static Task createEvent(String arguments) {
+        String[] eventFields = splitRequiredFields(arguments, "\\s+/from\\s+", EVENT_USAGE);
+        String[] timeRange = splitRequiredFields(eventFields[1], "\\s+/to\\s+", EVENT_USAGE);
+        return new Event(eventFields[0], timeRange[0], timeRange[1]);
+    }
+
+    /**
+     * Splits at the first delimiter and requires nonempty text on both sides.
+     * Date text remains uninterpreted, including subsequent delimiters.
+     */
+    private static String[] splitRequiredFields(String arguments, String delimiterPattern, String usage) {
+        String[] fields = arguments.split(delimiterPattern, 2);
+        if (fields.length != 2) {
+            throw new IllegalArgumentException(usage);
+        }
+        String firstField = fields[0].trim();
+        String secondField = fields[1].trim();
+        if (firstField.isEmpty() || secondField.isEmpty()) {
+            throw new IllegalArgumentException(usage);
+        }
+        return new String[] {firstField, secondField};
     }
 }

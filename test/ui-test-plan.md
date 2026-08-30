@@ -123,6 +123,45 @@ ideal grammar. Generated transcripts belong in ignored `_temp/`, not in commits.
           "exit": true
         }
       ]
+    },
+    {
+      "name": "Task-field parsing boundaries",
+      "aim": "Check missing descriptions, missing or reversed event fields, and preservation of free-form date text.",
+      "steps": [
+        {
+          "input": "deadline /by Sunday",
+          "expected": "Usage: deadline <description> /by <date/time>\n"
+        },
+        {
+          "input": "event /from Monday /to Tuesday",
+          "expected": "Usage: event <description> /from <start> /to <end>\n"
+        },
+        {
+          "input": "event meeting /from Monday /to",
+          "expected": "Usage: event <description> /from <start> /to <end>\n"
+        },
+        {
+          "input": "event meeting /to Tuesday /from Monday",
+          "expected": "Usage: event <description> /from <start> /to <end>\n"
+        },
+        {
+          "input": "deadline report /by Sunday /by later",
+          "expected": "____________________________________________________________\nGot it. I've added this task:\n  [D][ ] report (by: Sunday /by later)\nNow you have 1 tasks in the list.\n____________________________________________________________\n"
+        },
+        {
+          "input": "event conference /from 4/10/2019 /to 11/10/2019",
+          "expected": "____________________________________________________________\nGot it. I've added this task:\n  [E][ ] conference (from: 4/10/2019 to: 11/10/2019)\nNow you have 2 tasks in the list.\n____________________________________________________________\n"
+        },
+        {
+          "input": "list",
+          "expected": "____________________________________________________________\nHere are the tasks in your list:\n1.[D][ ] report (by: Sunday /by later)\n2.[E][ ] conference (from: 4/10/2019 to: 11/10/2019)\n____________________________________________________________\n"
+        },
+        {
+          "input": "bye",
+          "expected": "Woof! See you again!\n",
+          "exit": true
+        }
+      ]
     }
   ]
 }

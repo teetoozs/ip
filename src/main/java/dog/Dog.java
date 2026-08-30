@@ -111,20 +111,12 @@ public class Dog {
         scanner.close();
     }
 
-    /**
-     * Parses a task-creation command while preserving dates as plain text.
-     *
-     * @param commandWord Command identifying the task type.
-     * @param arguments Task description and any date/time fields.
-     * @return The task described by the command.
-     * @throws IllegalArgumentException If the command or required fields are invalid.
-     */
     private static Task createTask(String commandWord, String arguments) {
         if (commandWord.equalsIgnoreCase("todo")) {
             if (arguments.isEmpty()) {
                 throw new IllegalArgumentException("Usage: todo <description>");
             }
-            return new Task(arguments);
+            return new Todo(arguments);
         }
 
         if (commandWord.equalsIgnoreCase("deadline")) {
@@ -132,7 +124,7 @@ public class Dog {
             if (parts.length != 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
                 throw new IllegalArgumentException("Usage: deadline <description> /by <date/time>");
             }
-            return new Task(parts[0].trim(), Task.TYPE_DEADLINE, parts[1].trim(), "", "");
+            return new Deadline(parts[0].trim(), parts[1].trim());
         }
 
         if (commandWord.equalsIgnoreCase("event")) {
@@ -144,7 +136,7 @@ public class Dog {
             if (times.length != 2 || times[0].trim().isEmpty() || times[1].trim().isEmpty()) {
                 throw new IllegalArgumentException("Usage: event <description> /from <start> /to <end>");
             }
-            return new Task(parts[0].trim(), Task.TYPE_EVENT, "", times[0].trim(), times[1].trim());
+            return new Event(parts[0].trim(), times[0].trim(), times[1].trim());
         }
 
         throw new IllegalArgumentException("Unknown command. Use todo, deadline, event, list, mark, unmark, or bye.");

@@ -1,32 +1,37 @@
 package dog;
 
-/**
- * Represents a task and whether it has been completed.
- */
+
 public class Task {
+    public static final String TYPE_TODO = "T";
+    public static final String TYPE_DEADLINE = "D";
+    public static final String TYPE_EVENT = "E";
+
     private final String description;
+    private final String type;
+    private final String by;
+    private final String from;
+    private final String to;
     private boolean isDone;
 
-    /**
-     * Creates an incomplete task with the given description.
-     *
-     * @param description Description of the task.
-     */
     public Task(String description) {
+        this(description, TYPE_TODO, "", "", "");
+    }
+
+    public Task(String description, String type, String by, String from, String to) {
         this.description = description;
+        this.type = type;
+        this.by = by;
+        this.from = from;
+        this.to = to;
         this.isDone = false;
     }
 
-    /**
-     * Marks this task as completed.
-     */
+
     public void markAsDone() {
         isDone = true;
     }
 
-    /**
-     * Marks this task as incomplete.
-     */
+
     public void markAsNotDone() {
         isDone = false;
     }
@@ -37,6 +42,13 @@ public class Task {
 
     @Override
     public String toString() {
-        return "[" + getStatusIcon() + "] " + description;
+        String result = "[" + type + "][" + getStatusIcon() + "] " + description;
+        if (TYPE_DEADLINE.equals(type)) {
+            return result + " (by: " + by + ")";
+        }
+        if (TYPE_EVENT.equals(type)) {
+            return result + " (from: " + from + " to: " + to + ")";
+        }
+        return result;
     }
 }

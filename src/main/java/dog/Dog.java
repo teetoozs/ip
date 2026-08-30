@@ -15,14 +15,7 @@ public class Dog {
      * @param args Command-line arguments supplied to the program.
      */
     public static void main(String[] args) {
-        String banner = " ____              \n"
-                + "|  _ \\  ___   __ _ \n"
-                + "| | | |/ _ \\ / _` |\n"
-                + "| |_| | (_) | (_| |\n"
-                + "|____/ \\___/ \\__, |\n"
-                + "             |___/ \n";
-        System.out.println(banner);
-        System.out.println("Woof! What can I do for you today?");
+        printGreeting();
 
         Scanner scanner = new Scanner(System.in);
         Task[] tasks = new Task[MAX_TASKS];
@@ -39,16 +32,7 @@ public class Dog {
             }
 
             if (command.equalsIgnoreCase("list")) {
-                if (taskCount == 0) {
-                    System.out.println("Your task list is empty :(");
-                } else {
-                    System.out.println(DIVIDER);
-                    System.out.println("Here are the tasks in your list:");
-                    for (int i = 0; i < taskCount; i++) {
-                        System.out.println((i + 1) + "." + tasks[i]);
-                    }
-                    System.out.println(DIVIDER);
-                }
+                printTaskList(tasks, taskCount);
                 continue;
             }
 
@@ -80,9 +64,7 @@ public class Dog {
                 } else {
                     tasks[taskIndex].markAsNotDone();
                 }
-                String action = shouldMarkAsDone ? "marked as done" : "marked as not done";
-                System.out.println("Task " + (taskIndex + 1) + " has been " + action + ":");
-                System.out.println(tasks[taskIndex]);
+                printTaskStatus(tasks[taskIndex], taskIndex + 1, shouldMarkAsDone);
                 continue;
             }
 
@@ -102,13 +84,47 @@ public class Dog {
 
             tasks[taskCount] = task;
             taskCount++;
-            System.out.println(DIVIDER);
-            System.out.println("Got it. I've added this task:");
-            System.out.println("  " + task);
-            System.out.println("Now you have " + taskCount + " tasks in the list.");
-            System.out.println(DIVIDER);
+            printAddedTask(task, taskCount);
         }
         scanner.close();
+    }
+
+    private static void printGreeting() {
+        String banner = " ____              \n"
+                + "|  _ \\  ___   __ _ \n"
+                + "| | | |/ _ \\ / _` |\n"
+                + "| |_| | (_) | (_| |\n"
+                + "|____/ \\___/ \\__, |\n"
+                + "             |___/ \n";
+        System.out.println(banner);
+        System.out.println("Woof! What can I do for you today?");
+    }
+
+    private static void printTaskList(Task[] tasks, int taskCount) {
+        if (taskCount == 0) {
+            System.out.println("Your task list is empty :(");
+            return;
+        }
+        System.out.println(DIVIDER);
+        System.out.println("Here are the tasks in your list:");
+        for (int i = 0; i < taskCount; i++) {
+            System.out.println((i + 1) + "." + tasks[i]);
+        }
+        System.out.println(DIVIDER);
+    }
+
+    private static void printTaskStatus(Task task, int taskNumber, boolean isDone) {
+        String action = isDone ? "marked as done" : "marked as not done";
+        System.out.println("Task " + taskNumber + " has been " + action + ":");
+        System.out.println(task);
+    }
+
+    private static void printAddedTask(Task task, int taskCount) {
+        System.out.println(DIVIDER);
+        System.out.println("Got it. I've added this task:");
+        System.out.println("  " + task);
+        System.out.println("Now you have " + taskCount + " tasks in the list.");
+        System.out.println(DIVIDER);
     }
 
     private static Task createTask(String commandWord, String arguments) {

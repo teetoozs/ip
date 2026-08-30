@@ -31,62 +31,75 @@ public class Dog {
                 break;
             }
 
-            if (command.equalsIgnoreCase("list")) {
-                printTaskList(tasks, taskCount);
-                continue;
-            }
-
-            String[] commandParts = command.split("\\s+", 2);
-            String commandWord = commandParts[0];
-            if (commandWord.equalsIgnoreCase("mark") || commandWord.equalsIgnoreCase("unmark")) {
-                if (commandParts.length < 2) {
-                    System.out.println("Please provide a task number, for example: "
-                            + commandWord.toLowerCase() + " 1");
-                    continue;
-                }
-
-                int taskIndex;
-                try {
-                    taskIndex = Integer.parseInt(commandParts[1]) - 1;
-                } catch (NumberFormatException e) {
-                    System.out.println("Please provide a valid task number.");
-                    continue;
-                }
-
-                if (taskIndex < 0 || taskIndex >= taskCount) {
-                    System.out.println("That task number does not exist.");
-                    continue;
-                }
-
-                boolean shouldMarkAsDone = commandWord.equalsIgnoreCase("mark");
-                if (shouldMarkAsDone) {
-                    tasks[taskIndex].markAsDone();
-                } else {
-                    tasks[taskIndex].markAsNotDone();
-                }
-                printTaskStatus(tasks[taskIndex], taskIndex + 1, shouldMarkAsDone);
-                continue;
-            }
-
-            if (taskCount == MAX_TASKS) {
-                System.out.println("I cannot store more than " + MAX_TASKS + " tasks.");
-                continue;
-            }
-
-            String arguments = commandParts.length == 2 ? commandParts[1].trim() : "";
-            Task task;
             try {
-                task = createTask(commandWord, arguments);
+                taskCount = executeCommand(command, tasks, taskCount);
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
-                continue;
             }
-
-            tasks[taskCount] = task;
-            taskCount++;
-            printAddedTask(task, taskCount);
         }
         scanner.close();
+    }
+
+    /**
+     * Executes a non-exit command and returns the resulting task count.
+     * Invalid commands leave the task list unchanged.
+     */
+    private static int executeCommand(String command, Task[] tasks, int taskCount) {
+        if (command.equalsIgnoreCase("list")) {
+            printTaskList(tasks, taskCount);
+            return taskCount;
+        }
+
+        String[] commandParts = command.split("\\s+", 2);
+        String commandWord = commandParts[0];
+        String arguments = commandParts.length == 2 ? commandParts[1] : "";
+        if (commandWord.equalsIgnoreCase("mark") || commandWord.equalsIgnoreCase("unmark")) {
+            updateTaskStatus(commandWord, arguments, tasks, taskCount);
+            return taskCount;
+        }
+
+        if (taskCount == MAX_TASKS) {
+            throw new IllegalArgumentException("I cannot store more than " + MAX_TASKS + " tasks.");
+        }
+        Task task = createTask(commandWord, arguments.trim());
+        tasks[taskCount] = task;
+        int updatedTaskCount = taskCount + 1;
+        printAddedTask(task, updatedTaskCount);
+        return updatedTaskCount;
+    }
+
+    /**
+     * Updates a selected task only after validating its one-based number.
+     */
+    private static void updateTaskStatus(String commandWord, String arguments, Task[] tasks, int taskCount) {
+        if (arguments.isEmpty()) {
+            throw new IllegalArgumentException("Please provide a task number, for example: "
+                    + commandWord.toLowerCase() + " 1");
+        }
+        int taskIndex = parseTaskIndex(arguments, taskCount);
+        boolean shouldMarkAsDone = commandWord.equalsIgnoreCase("mark");
+        if (shouldMarkAsDone) {
+            tasks[taskIndex].markAsDone();
+        } else {
+            tasks[taskIndex].markAsNotDone();
+        }
+        printTaskStatus(tasks[taskIndex], taskIndex + 1, shouldMarkAsDone);
+    }
+
+    /**
+     * Converts a user-facing task number into a valid array index.
+     */
+    private static int parseTaskIndex(String taskNumber, int taskCount) {
+        int taskIndex;
+        try {
+            taskIndex = Integer.parseInt(taskNumber) - 1;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Please provide a valid task number.", e);
+        }
+        if (taskIndex < 0 || taskIndex >= taskCount) {
+            throw new IllegalArgumentException("That task number does not exist.");
+        }
+        return taskIndex;
     }
 
     private static void printGreeting() {

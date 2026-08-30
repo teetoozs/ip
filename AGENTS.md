@@ -32,6 +32,15 @@ Ensure that Java 25 is used when running the application or build tasks. On macO
 
 Use the project-specific `seedu-java-coding-standard` skill for all Java code creation, modification, refactoring, and review. All Java code must follow the SE-EDU basic and intermediate Java coding standard.
 
+## UI testing
+
+After each code update, review `test/ui-test-plan.md` and update it if intended
+behavior or coverage changes. Read and invoke the project-specific `test-ui`
+skill before reporting the update complete. Stop at the first failed test and
+report actual versus expected output with the console transcript. Do not alter
+expectations merely to hide a regression. If testing is blocked, report the
+blocker rather than claiming success.
+
 ## Git
 
 Use lightweight tags unless the user requests an annotated tag.

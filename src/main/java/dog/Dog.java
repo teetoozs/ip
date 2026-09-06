@@ -8,8 +8,10 @@ import java.util.Scanner;
 public class Dog {
     private static final int MAX_TASKS = 100;
     private static final String DIVIDER = "____________________________________________________________";
-    private static final String DEADLINE_USAGE = "Usage: deadline <description> /by <date/time>";
-    private static final String EVENT_USAGE = "Usage: event <description> /from <start> /to <end>";
+    private static final String TODO_ERROR = "OOPS!!! A todo needs a description.";
+    private static final String DEADLINE_ERROR = "OOPS!!! A deadline needs a description and a /by date or time.";
+    private static final String EVENT_ERROR = "OOPS!!! An event needs a description, /from time, and /to time.";
+    private static final String UNKNOWN_COMMAND_ERROR = "OOPS!!! I don't know what that command means.";
 
     /**
      * Starts the chatbot and processes commands until the user exits.
@@ -36,7 +38,7 @@ public class Dog {
             try {
                 taskCount = executeCommand(command, tasks, taskCount);
             } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
+                printError(e.getMessage());
             }
         }
         scanner.close();
@@ -60,10 +62,10 @@ public class Dog {
             return taskCount;
         }
 
-        if (taskCount == MAX_TASKS) {
-            throw new IllegalArgumentException("I cannot store more than " + MAX_TASKS + " tasks.");
-        }
         Task task = createTask(commandWord, arguments.trim());
+        if (taskCount == MAX_TASKS) {
+            throw new IllegalArgumentException("OOPS!!! I cannot store more than " + MAX_TASKS + " tasks.");
+        }
         tasks[taskCount] = task;
         int updatedTaskCount = taskCount + 1;
         printAddedTask(task, updatedTaskCount);
@@ -142,10 +144,16 @@ public class Dog {
         System.out.println(DIVIDER);
     }
 
+    private static void printError(String message) {
+        System.out.println(DIVIDER);
+        System.out.println(message);
+        System.out.println(DIVIDER);
+    }
+
     private static Task createTask(String commandWord, String arguments) {
         if (commandWord.equalsIgnoreCase("todo")) {
             if (arguments.isEmpty()) {
-                throw new IllegalArgumentException("Usage: todo <description>");
+                throw new IllegalArgumentException(TODO_ERROR);
             }
             return new Todo(arguments);
         }
@@ -158,17 +166,17 @@ public class Dog {
             return createEvent(arguments);
         }
 
-        throw new IllegalArgumentException("Unknown command. Use todo, deadline, event, list, mark, unmark, or bye.");
+        throw new IllegalArgumentException(UNKNOWN_COMMAND_ERROR);
     }
 
     private static Task createDeadline(String arguments) {
-        String[] deadlineFields = splitRequiredFields(arguments, "\\s+/by\\s+", DEADLINE_USAGE);
+        String[] deadlineFields = splitRequiredFields(arguments, "\\s+/by\\s+", DEADLINE_ERROR);
         return new Deadline(deadlineFields[0], deadlineFields[1]);
     }
 
     private static Task createEvent(String arguments) {
-        String[] eventFields = splitRequiredFields(arguments, "\\s+/from\\s+", EVENT_USAGE);
-        String[] timeRange = splitRequiredFields(eventFields[1], "\\s+/to\\s+", EVENT_USAGE);
+        String[] eventFields = splitRequiredFields(arguments, "\\s+/from\\s+", EVENT_ERROR);
+        String[] timeRange = splitRequiredFields(eventFields[1], "\\s+/to\\s+", EVENT_ERROR);
         return new Event(eventFields[0], timeRange[0], timeRange[1]);
     }
 

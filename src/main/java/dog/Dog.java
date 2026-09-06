@@ -2,6 +2,11 @@ package dog;
 
 import java.util.Scanner;
 
+import dog.task.Deadline;
+import dog.task.Event;
+import dog.task.Task;
+import dog.task.Todo;
+
 /**
  * Runs the Dog chatbot and handles commands entered by the user.
  */

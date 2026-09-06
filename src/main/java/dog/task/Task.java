@@ -1,4 +1,4 @@
-package dog;
+package dog.task;
 
 /**
  * Represents a task that can be marked as completed.

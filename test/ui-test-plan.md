@@ -64,27 +64,31 @@ ideal grammar. Generated transcripts belong in ignored `_temp/`, not in commits.
       "steps": [
         {
           "input": "todo",
-          "expected": "Usage: todo <description>\n"
+          "expected": "____________________________________________________________\nOOPS!!! A todo needs a description.\n____________________________________________________________\n"
         },
         {
           "input": "deadline book /by",
-          "expected": "Usage: deadline <description> /by <date/time>\n"
+          "expected": "____________________________________________________________\nOOPS!!! A deadline needs a description and a /by date or time.\n____________________________________________________________\n"
         },
         {
           "input": "event meeting /from Monday",
-          "expected": "Usage: event <description> /from <start> /to <end>\n"
+          "expected": "____________________________________________________________\nOOPS!!! An event needs a description, /from time, and /to time.\n____________________________________________________________\n"
         },
         {
           "input": "mark",
-          "expected": "Please provide a task number, for example: mark 1\n"
+          "expected": "____________________________________________________________\nPlease provide a task number, for example: mark 1\n____________________________________________________________\n"
         },
         {
           "input": "mark abc",
-          "expected": "Please provide a valid task number.\n"
+          "expected": "____________________________________________________________\nPlease provide a valid task number.\n____________________________________________________________\n"
         },
         {
           "input": "unmark 0",
-          "expected": "That task number does not exist.\n"
+          "expected": "____________________________________________________________\nThat task number does not exist.\n____________________________________________________________\n"
+        },
+        {
+          "input": "blah",
+          "expected": "____________________________________________________________\nOOPS!!! I don't know what that command means.\n____________________________________________________________\n"
         },
         {
           "input": "list",
@@ -130,19 +134,19 @@ ideal grammar. Generated transcripts belong in ignored `_temp/`, not in commits.
       "steps": [
         {
           "input": "deadline /by Sunday",
-          "expected": "Usage: deadline <description> /by <date/time>\n"
+          "expected": "____________________________________________________________\nOOPS!!! A deadline needs a description and a /by date or time.\n____________________________________________________________\n"
         },
         {
           "input": "event /from Monday /to Tuesday",
-          "expected": "Usage: event <description> /from <start> /to <end>\n"
+          "expected": "____________________________________________________________\nOOPS!!! An event needs a description, /from time, and /to time.\n____________________________________________________________\n"
         },
         {
           "input": "event meeting /from Monday /to",
-          "expected": "Usage: event <description> /from <start> /to <end>\n"
+          "expected": "____________________________________________________________\nOOPS!!! An event needs a description, /from time, and /to time.\n____________________________________________________________\n"
         },
         {
           "input": "event meeting /to Tuesday /from Monday",
-          "expected": "Usage: event <description> /from <start> /to <end>\n"
+          "expected": "____________________________________________________________\nOOPS!!! An event needs a description, /from time, and /to time.\n____________________________________________________________\n"
         },
         {
           "input": "deadline report /by Sunday /by later",

@@ -66,6 +66,9 @@ public class Dog {
             updateTaskStatus(commandWord, arguments, tasks, taskCount);
             return taskCount;
         }
+        if (commandWord.equalsIgnoreCase("delete")) {
+            return deleteTask(arguments, tasks, taskCount);
+        }
 
         Task task = createTask(commandWord, arguments.trim());
         if (taskCount == MAX_TASKS) {
@@ -74,6 +77,24 @@ public class Dog {
         tasks[taskCount] = task;
         int updatedTaskCount = taskCount + 1;
         printAddedTask(task, updatedTaskCount);
+        return updatedTaskCount;
+    }
+
+    /**
+     * Deletes a selected task and returns the reduced task count.
+     */
+    private static int deleteTask(String arguments, Task[] tasks, int taskCount) {
+        if (arguments.isEmpty()) {
+            throw new IllegalArgumentException("Please provide a task number, for example: delete 1");
+        }
+        int taskIndex = parseTaskIndex(arguments, taskCount);
+        Task removedTask = tasks[taskIndex];
+        for (int i = taskIndex; i < taskCount - 1; i++) {
+            tasks[i] = tasks[i + 1];
+        }
+        int updatedTaskCount = taskCount - 1;
+        tasks[updatedTaskCount] = null;
+        printDeletedTask(removedTask, updatedTaskCount);
         return updatedTaskCount;
     }
 
@@ -144,6 +165,14 @@ public class Dog {
     private static void printAddedTask(Task task, int taskCount) {
         System.out.println(DIVIDER);
         System.out.println("Got it. I've added this task:");
+        System.out.println("  " + task);
+        System.out.println("Now you have " + taskCount + " tasks in the list.");
+        System.out.println(DIVIDER);
+    }
+
+    private static void printDeletedTask(Task task, int taskCount) {
+        System.out.println(DIVIDER);
+        System.out.println("Noted. I've removed this task:");
         System.out.println("  " + task);
         System.out.println("Now you have " + taskCount + " tasks in the list.");
         System.out.println(DIVIDER);

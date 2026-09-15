@@ -52,6 +52,14 @@ ideal grammar. Generated transcripts belong in ignored `_temp/`, not in commits.
           "expected": "Task 2 has been marked as not done:\n[D][ ] homework (by: no idea :-p)\n"
         },
         {
+          "input": "delete 2",
+          "expected": "____________________________________________________________\nNoted. I've removed this task:\n  [D][ ] homework (by: no idea :-p)\nNow you have 2 tasks in the list.\n____________________________________________________________\n"
+        },
+        {
+          "input": "list",
+          "expected": "____________________________________________________________\nHere are the tasks in your list:\n1.[T][X] borrow book\n2.[E][X] meeting (from: Mon 2pm to: 4pm)\n____________________________________________________________\n"
+        },
+        {
           "input": "bye",
           "expected": "Woof! See you again!\n",
           "exit": true
@@ -84,6 +92,14 @@ ideal grammar. Generated transcripts belong in ignored `_temp/`, not in commits.
         },
         {
           "input": "unmark 0",
+          "expected": "____________________________________________________________\nThat task number does not exist.\n____________________________________________________________\n"
+        },
+        {
+          "input": "delete",
+          "expected": "____________________________________________________________\nPlease provide a task number, for example: delete 1\n____________________________________________________________\n"
+        },
+        {
+          "input": "delete 1",
           "expected": "____________________________________________________________\nThat task number does not exist.\n____________________________________________________________\n"
         },
         {

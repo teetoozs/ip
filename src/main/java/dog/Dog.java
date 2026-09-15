@@ -1,5 +1,6 @@
 package dog;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import dog.task.Deadline;
@@ -11,7 +12,6 @@ import dog.task.Todo;
  * Runs the Dog chatbot and handles commands entered by the user.
  */
 public class Dog {
-    private static final int MAX_TASKS = 100;
     private static final String DIVIDER = "____________________________________________________________";
     private static final String TODO_ERROR = "OOPS!!! A todo needs a description.";
     private static final String DEADLINE_ERROR = "OOPS!!! A deadline needs a description and a /by date or time.";
@@ -27,8 +27,7 @@ public class Dog {
         printGreeting();
 
         Scanner scanner = new Scanner(System.in);
-        Task[] tasks = new Task[MAX_TASKS];
-        int taskCount = 0;
+        ArrayList<Task> tasks = new ArrayList<>();
 
         while (true) {
             System.out.print("> ");
@@ -41,7 +40,7 @@ public class Dog {
             }
 
             try {
-                taskCount = executeCommand(command, tasks, taskCount);
+                executeCommand(command, tasks);
             } catch (IllegalArgumentException e) {
                 printError(e.getMessage());
             }
@@ -50,49 +49,60 @@ public class Dog {
     }
 
     /**
-     * Executes a non-exit command and returns the resulting task count.
+     * Executes a non-exit command.
      * Invalid commands leave the task list unchanged.
      */
-    private static int executeCommand(String command, Task[] tasks, int taskCount) {
+    private static void executeCommand(String command, ArrayList<Task> tasks) {
         if (command.equalsIgnoreCase("list")) {
-            printTaskList(tasks, taskCount);
-            return taskCount;
+            printTaskList(tasks);
+            return;
         }
 
         String[] commandParts = command.split("\\s+", 2);
         String commandWord = commandParts[0];
         String arguments = commandParts.length == 2 ? commandParts[1] : "";
         if (commandWord.equalsIgnoreCase("mark") || commandWord.equalsIgnoreCase("unmark")) {
-            updateTaskStatus(commandWord, arguments, tasks, taskCount);
-            return taskCount;
+            updateTaskStatus(commandWord, arguments, tasks);
+            return;
+        }
+        if (commandWord.equalsIgnoreCase("delete")) {
+            deleteTask(arguments, tasks);
+            return;
         }
 
         Task task = createTask(commandWord, arguments.trim());
-        if (taskCount == MAX_TASKS) {
-            throw new IllegalArgumentException("OOPS!!! I cannot store more than " + MAX_TASKS + " tasks.");
+        tasks.add(task);
+        printAddedTask(task, tasks.size());
+    }
+
+    /**
+     * Deletes a selected task from the list.
+     */
+    private static void deleteTask(String arguments, ArrayList<Task> tasks) {
+        if (arguments.isEmpty()) {
+            throw new IllegalArgumentException("Please provide a task number, for example: delete 1");
         }
-        tasks[taskCount] = task;
-        int updatedTaskCount = taskCount + 1;
-        printAddedTask(task, updatedTaskCount);
-        return updatedTaskCount;
+        int taskIndex = parseTaskIndex(arguments, tasks.size());
+        Task removedTask = tasks.remove(taskIndex);
+        printDeletedTask(removedTask, tasks.size());
     }
 
     /**
      * Updates a selected task only after validating its one-based number.
      */
-    private static void updateTaskStatus(String commandWord, String arguments, Task[] tasks, int taskCount) {
+    private static void updateTaskStatus(String commandWord, String arguments, ArrayList<Task> tasks) {
         if (arguments.isEmpty()) {
             throw new IllegalArgumentException("Please provide a task number, for example: "
                     + commandWord.toLowerCase() + " 1");
         }
-        int taskIndex = parseTaskIndex(arguments, taskCount);
+        int taskIndex = parseTaskIndex(arguments, tasks.size());
         boolean shouldMarkAsDone = commandWord.equalsIgnoreCase("mark");
         if (shouldMarkAsDone) {
-            tasks[taskIndex].markAsDone();
+            tasks.get(taskIndex).markAsDone();
         } else {
-            tasks[taskIndex].markAsNotDone();
+            tasks.get(taskIndex).markAsNotDone();
         }
-        printTaskStatus(tasks[taskIndex], taskIndex + 1, shouldMarkAsDone);
+        printTaskStatus(tasks.get(taskIndex), taskIndex + 1, shouldMarkAsDone);
     }
 
     /**
@@ -122,15 +132,15 @@ public class Dog {
         System.out.println("Woof! What can I do for you today?");
     }
 
-    private static void printTaskList(Task[] tasks, int taskCount) {
-        if (taskCount == 0) {
+    private static void printTaskList(ArrayList<Task> tasks) {
+        if (tasks.isEmpty()) {
             System.out.println("Your task list is empty :(");
             return;
         }
         System.out.println(DIVIDER);
         System.out.println("Here are the tasks in your list:");
-        for (int i = 0; i < taskCount; i++) {
-            System.out.println((i + 1) + "." + tasks[i]);
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println((i + 1) + "." + tasks.get(i));
         }
         System.out.println(DIVIDER);
     }
@@ -144,6 +154,14 @@ public class Dog {
     private static void printAddedTask(Task task, int taskCount) {
         System.out.println(DIVIDER);
         System.out.println("Got it. I've added this task:");
+        System.out.println("  " + task);
+        System.out.println("Now you have " + taskCount + " tasks in the list.");
+        System.out.println(DIVIDER);
+    }
+
+    private static void printDeletedTask(Task task, int taskCount) {
+        System.out.println(DIVIDER);
+        System.out.println("Noted. I've removed this task:");
         System.out.println("  " + task);
         System.out.println("Now you have " + taskCount + " tasks in the list.");
         System.out.println(DIVIDER);

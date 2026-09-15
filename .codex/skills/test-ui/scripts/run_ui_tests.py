@@ -70,6 +70,8 @@ def load_plan(path):
             raise ValueError("Every case needs a name, aim, and steps.")
         if "data_file" in case and not isinstance(case["data_file"], str):
             raise ValueError("A case data_file must be a string.")
+        if "startup" in case and not isinstance(case["startup"], str):
+            raise ValueError("A case startup must be a string.")
         for index, step in enumerate(case["steps"]):
             if not isinstance(step.get("input"), str) or not isinstance(step.get("expected"), str):
                 raise ValueError("Each step needs input and expected strings.")
@@ -181,7 +183,8 @@ def main():
                         data_directory.mkdir()
                         (data_directory / "dog.txt").write_text(
                             case["data_file"], encoding="utf-8")
-                    run_case(case, plan["startup"], commands["java"], classes,
+                    startup = case.get("startup", plan["startup"])
+                    run_case(case, startup, commands["java"], classes,
                              working_directory, args.timeout, record)
             record(f"\nPASS: {len(plan['cases'])} cases. Transcript: {transcript}\n")
             return 0

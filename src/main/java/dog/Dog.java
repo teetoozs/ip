@@ -1,7 +1,10 @@
 package dog;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Scanner;
 
+import dog.storage.Storage;
 import dog.task.Deadline;
 import dog.task.Event;
 import dog.task.Task;
@@ -28,7 +31,8 @@ public class Dog {
 
         Scanner scanner = new Scanner(System.in);
         Task[] tasks = new Task[MAX_TASKS];
-        int taskCount = 0;
+        Storage storage = new Storage(Path.of("data", "dog.txt"));
+        int taskCount = loadTasks(storage, tasks);
 
         while (true) {
             System.out.print("> ");
@@ -41,9 +45,11 @@ public class Dog {
             }
 
             try {
-                taskCount = executeCommand(command, tasks, taskCount);
+                taskCount = executeCommand(command, tasks, taskCount, storage);
             } catch (IllegalArgumentException e) {
                 printError(e.getMessage());
+            } catch (IOException e) {
+                printError("OOPS!!! I couldn't save your tasks.");
             }
         }
         scanner.close();
@@ -53,7 +59,8 @@ public class Dog {
      * Executes a non-exit command and returns the resulting task count.
      * Invalid commands leave the task list unchanged.
      */
-    private static int executeCommand(String command, Task[] tasks, int taskCount) {
+    private static int executeCommand(String command, Task[] tasks, int taskCount, Storage storage)
+            throws IOException {
         if (command.equalsIgnoreCase("list")) {
             printTaskList(tasks, taskCount);
             return taskCount;
@@ -64,6 +71,7 @@ public class Dog {
         String arguments = commandParts.length == 2 ? commandParts[1] : "";
         if (commandWord.equalsIgnoreCase("mark") || commandWord.equalsIgnoreCase("unmark")) {
             updateTaskStatus(commandWord, arguments, tasks, taskCount);
+            storage.saveTasks(tasks, taskCount);
             return taskCount;
         }
 
@@ -73,8 +81,24 @@ public class Dog {
         }
         tasks[taskCount] = task;
         int updatedTaskCount = taskCount + 1;
+        storage.saveTasks(tasks, updatedTaskCount);
         printAddedTask(task, updatedTaskCount);
         return updatedTaskCount;
+    }
+
+    private static int loadTasks(Storage storage, Task[] tasks) {
+        try {
+            int taskCount = storage.loadTasks(tasks);
+            if (storage.getSkippedLineCount() > 0) {
+                int skippedLineCount = storage.getSkippedLineCount();
+                String entryLabel = skippedLineCount == 1 ? "entry" : "entries";
+                printError("OOPS!!! I skipped " + skippedLineCount + " corrupted data " + entryLabel + ".");
+            }
+            return taskCount;
+        } catch (IOException e) {
+            printError("OOPS!!! I couldn't load your saved tasks.");
+            return 0;
+        }
     }
 
     /**

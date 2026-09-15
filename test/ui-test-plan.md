@@ -166,6 +166,23 @@ ideal grammar. Generated transcripts belong in ignored `_temp/`, not in commits.
           "exit": true
         }
       ]
+    },
+    {
+      "name": "Load saved tasks and skip corrupted data",
+      "aim": "Check that saved task types and statuses load while a corrupted record is ignored.",
+      "data_file": "T|1|cmVhZCBib29r\ncorrupted data\nD|0|cmV0dXJuIGJvb2s=|SnVuZSA2dGg=\nE|0|cHJvamVjdCBtZWV0aW5n|QXVnIDZ0aCAycG0=|NHBt\n",
+      "startup": " ____              \n|  _ \\  ___   __ _ \n| | | |/ _ \\ / _` |\n| |_| | (_) | (_| |\n|____/ \\___/ \\__, |\n             |___/ \n\nWoof! What can I do for you today?\n____________________________________________________________\nOOPS!!! I skipped 1 corrupted data entry.\n____________________________________________________________\n",
+      "steps": [
+        {
+          "input": "list",
+          "expected": "____________________________________________________________\nHere are the tasks in your list:\n1.[T][X] read book\n2.[D][ ] return book (by: June 6th)\n3.[E][ ] project meeting (from: Aug 6th 2pm to: 4pm)\n____________________________________________________________\n"
+        },
+        {
+          "input": "bye",
+          "expected": "Woof! See you again!\n",
+          "exit": true
+        }
+      ]
     }
   ]
 }

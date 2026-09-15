@@ -1,8 +1,11 @@
 package dog;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import dog.storage.Storage;
 import dog.task.Deadline;
 import dog.task.Event;
 import dog.task.Task;
@@ -27,7 +30,8 @@ public class Dog {
         printGreeting();
 
         Scanner scanner = new Scanner(System.in);
-        ArrayList<Task> tasks = new ArrayList<>();
+        Storage storage = new Storage(Path.of("data", "dog.txt"));
+        ArrayList<Task> tasks = loadTasks(storage);
 
         while (true) {
             System.out.print("> ");
@@ -40,9 +44,11 @@ public class Dog {
             }
 
             try {
-                executeCommand(command, tasks);
+                executeCommand(command, tasks, storage);
             } catch (IllegalArgumentException e) {
                 printError(e.getMessage());
+            } catch (IOException e) {
+                printError("OOPS!!! I couldn't save your tasks.");
             }
         }
         scanner.close();
@@ -52,7 +58,8 @@ public class Dog {
      * Executes a non-exit command.
      * Invalid commands leave the task list unchanged.
      */
-    private static void executeCommand(String command, ArrayList<Task> tasks) {
+    private static void executeCommand(String command, ArrayList<Task> tasks, Storage storage)
+            throws IOException {
         if (command.equalsIgnoreCase("list")) {
             printTaskList(tasks);
             return;
@@ -63,16 +70,34 @@ public class Dog {
         String arguments = commandParts.length == 2 ? commandParts[1] : "";
         if (commandWord.equalsIgnoreCase("mark") || commandWord.equalsIgnoreCase("unmark")) {
             updateTaskStatus(commandWord, arguments, tasks);
+            storage.saveTasks(tasks);
             return;
         }
         if (commandWord.equalsIgnoreCase("delete")) {
             deleteTask(arguments, tasks);
+            storage.saveTasks(tasks);
             return;
         }
 
         Task task = createTask(commandWord, arguments.trim());
         tasks.add(task);
+        storage.saveTasks(tasks);
         printAddedTask(task, tasks.size());
+    }
+
+    private static ArrayList<Task> loadTasks(Storage storage) {
+        try {
+            ArrayList<Task> tasks = storage.loadTasks();
+            if (storage.getSkippedLineCount() > 0) {
+                int skippedLineCount = storage.getSkippedLineCount();
+                String entryLabel = skippedLineCount == 1 ? "entry" : "entries";
+                printError("OOPS!!! I skipped " + skippedLineCount + " corrupted data " + entryLabel + ".");
+            }
+            return tasks;
+        } catch (IOException e) {
+            printError("OOPS!!! I couldn't load your saved tasks.");
+            return new ArrayList<>();
+        }
     }
 
     /**

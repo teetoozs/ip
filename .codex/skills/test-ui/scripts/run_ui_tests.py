@@ -68,6 +68,8 @@ def load_plan(path):
     for case in plan["cases"]:
         if not case.get("name") or not case.get("aim") or not case.get("steps"):
             raise ValueError("Every case needs a name, aim, and steps.")
+        if "data_file" in case and not isinstance(case["data_file"], str):
+            raise ValueError("A case data_file must be a string.")
         for index, step in enumerate(case["steps"]):
             if not isinstance(step.get("input"), str) or not isinstance(step.get("expected"), str):
                 raise ValueError("Each step needs input and expected strings.")
@@ -80,10 +82,10 @@ def load_plan(path):
     return plan
 
 
-def run_case(case, startup, java, classes, repo, timeout, record):
+def run_case(case, startup, java, classes, working_directory, timeout, record):
     record(f"\nCASE: {case['name']}\nAIM: {case['aim']}\n")
     process = subprocess.Popen(
-        [java, "-cp", str(classes), "dog.Dog"], cwd=repo,
+        [java, "-cp", str(classes), "dog.Dog"], cwd=working_directory,
         stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
         text=True, encoding="utf-8", errors="replace", bufsize=1)
     output_queue = queue.Queue()
@@ -158,7 +160,9 @@ def main():
                 record(details + "\n")
                 commands[name] = executable
             with tempfile.TemporaryDirectory(prefix="dog-ui-tests-") as temporary:
-                classes = Path(temporary)
+                temporary_root = Path(temporary)
+                classes = temporary_root / "classes"
+                classes.mkdir()
                 sources = sorted((repo / "src/main/java").rglob("*.java"))
                 if not sources:
                     raise ValueError("No production Java sources found.")
@@ -169,9 +173,16 @@ def main():
                 record("COMPILE OUTPUT:\n" + compilation.stdout + compilation.stderr)
                 if compilation.returncode:
                     raise TestFailure("Compilation failed; expected exit 0.")
-                for case in plan["cases"]:
+                for index, case in enumerate(plan["cases"]):
+                    working_directory = temporary_root / "cases" / str(index)
+                    working_directory.mkdir(parents=True)
+                    if "data_file" in case:
+                        data_directory = working_directory / "data"
+                        data_directory.mkdir()
+                        (data_directory / "dog.txt").write_text(
+                            case["data_file"], encoding="utf-8")
                     run_case(case, plan["startup"], commands["java"], classes,
-                             repo, args.timeout, record)
+                             working_directory, args.timeout, record)
             record(f"\nPASS: {len(plan['cases'])} cases. Transcript: {transcript}\n")
             return 0
         except (TestFailure, ValueError, OSError, subprocess.TimeoutExpired) as error:

@@ -268,3 +268,10 @@ ideal grammar. Generated transcripts belong in ignored `_temp/`, not in commits.
 Start `dog.Dog` from freshly compiled classes. Type a todo, mark it, list it,
 unmark it and exit. Confirm the actual screen output matches the recorded status
 format; do not describe the scripted tests as manual testing.
+
+## End-of-input smoke check
+
+Aim: verify that closing standard input exits cleanly instead of throwing an
+exception. Run the release JAR in an empty folder with an empty input stream.
+Expected: the normal greeting, followed by `> Woof! See you again!`, and exit
+code 0. Record this check in the release smoke-test transcript.

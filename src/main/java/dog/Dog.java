@@ -2,245 +2,120 @@ package dog;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Scanner;
 
 import dog.parser.Parser;
 import dog.storage.Storage;
 import dog.task.Task;
+import dog.task.TaskList;
+import dog.ui.Ui;
 
 /**
- * Runs the Dog chatbot and handles commands entered by the user.
+ * Coordinates console interaction, command parsing, task operations, and storage.
  */
 public class Dog {
-    private static final String DIVIDER = "____________________________________________________________";
+    private final Storage storage;
+    private final Ui ui;
+    private TaskList tasks;
 
     /**
-     * Starts the chatbot and processes commands until the user exits.
+     * Creates a chatbot that stores tasks at the specified path.
      *
-     * @param args Command-line arguments supplied to the program.
+     * @param filePath Path of the task data file.
      */
-    public static void main(String[] args) {
-        printGreeting();
-
-        Scanner scanner = new Scanner(System.in);
-        Storage storage = new Storage(Path.of("data", "dog.txt"));
-        ArrayList<Task> tasks = loadTasks(storage);
-
-        while (true) {
-            System.out.print("> ");
-            String input = scanner.nextLine();
-            String command = input.trim();
-
-            if (command.equalsIgnoreCase("bye")) {
-                System.out.println("Woof! See you again!");
-                break;
-            }
-
-            try {
-                executeCommand(command, tasks, storage);
-            } catch (IllegalArgumentException e) {
-                printError(e.getMessage());
-            } catch (IOException e) {
-                printError("OOPS!!! I couldn't save your tasks.");
-            }
-        }
-        scanner.close();
+    public Dog(Path filePath) {
+        storage = new Storage(filePath);
+        ui = new Ui();
+        tasks = new TaskList();
     }
 
     /**
-     * Executes a non-exit command.
-     * Invalid commands leave the task list unchanged.
+     * Starts the chatbot using a data file relative to the working directory.
+     *
+     * @param args Command-line arguments, which are not used.
      */
-    private static void executeCommand(String command, ArrayList<Task> tasks, Storage storage)
-            throws IOException {
+    public static void main(String[] args) {
+        new Dog(Path.of("data", "dog.txt")).run();
+    }
+
+    /**
+     * Loads saved tasks and processes commands until bye or end of input.
+     */
+    public void run() {
+        try (ui) {
+            ui.printGreeting();
+            loadTasks();
+            while (true) {
+                String command = ui.readCommand();
+                if (command.equalsIgnoreCase("bye")) {
+                    ui.printGoodbye();
+                    return;
+                }
+                try {
+                    executeCommand(command);
+                } catch (IllegalArgumentException e) {
+                    ui.printError(e.getMessage());
+                } catch (IOException e) {
+                    ui.printError("OOPS!!! I couldn't save your tasks.");
+                }
+            }
+        }
+    }
+
+    /**
+     * Executes a command and saves the collection after a mutation.
+     *
+     * @param command Trimmed user command.
+     * @throws IOException If saving fails.
+     * @throws IllegalArgumentException If the command is invalid.
+     */
+    private void executeCommand(String command) throws IOException {
         if (command.equalsIgnoreCase("list")) {
-            printTaskList(tasks);
+            ui.printTaskList(tasks.getTasks());
             return;
         }
 
-        String[] commandParts = command.split("\\s+", 2);
-        String commandWord = commandParts[0];
-        String arguments = commandParts.length == 2 ? commandParts[1] : "";
+        String commandWord = Parser.getCommandWord(command);
+        String arguments = Parser.getArguments(command);
         if (commandWord.equalsIgnoreCase("find")) {
-            printMatchingTasks(arguments.trim(), tasks);
+            ui.printMatchingTasks(tasks.find(arguments));
             return;
         }
         if (commandWord.equalsIgnoreCase("mark") || commandWord.equalsIgnoreCase("unmark")) {
-            updateTaskStatus(commandWord, arguments, tasks);
-            storage.saveTasks(tasks);
+            int index = Parser.parseTaskIndex(commandWord, arguments, tasks.size());
+            boolean isDone = commandWord.equalsIgnoreCase("mark");
+            Task task = tasks.setDone(index, isDone);
+            storage.saveTasks(tasks.getTasks());
+            ui.printTaskStatus(task, index + 1, isDone);
             return;
         }
         if (commandWord.equalsIgnoreCase("delete")) {
-            deleteTask(arguments, tasks);
-            storage.saveTasks(tasks);
+            int index = Parser.parseTaskIndex(commandWord, arguments, tasks.size());
+            Task removedTask = tasks.delete(index);
+            storage.saveTasks(tasks.getTasks());
+            ui.printDeletedTask(removedTask, tasks.size());
             return;
         }
 
-        Task task = Parser.createTask(commandWord, arguments.trim());
+        Task task = Parser.createTask(commandWord, arguments);
         tasks.add(task);
-        storage.saveTasks(tasks);
-        printAddedTask(task, tasks.size());
+        storage.saveTasks(tasks.getTasks());
+        ui.printAddedTask(task, tasks.size());
     }
 
     /**
-     * Loads saved tasks, reporting skipped records or a read failure.
-     *
-     * @param storage Storage to read.
-     * @return Loaded tasks, or an empty list if reading fails.
+     * Loads valid tasks and reports skipped records or a read failure.
      */
-    private static ArrayList<Task> loadTasks(Storage storage) {
+    private void loadTasks() {
         try {
-            ArrayList<Task> tasks = storage.loadTasks();
-            if (storage.getSkippedLineCount() > 0) {
-                int skippedLineCount = storage.getSkippedLineCount();
+            tasks = new TaskList(storage.loadTasks());
+            int skippedLineCount = storage.getSkippedLineCount();
+            if (skippedLineCount > 0) {
                 String entryLabel = skippedLineCount == 1 ? "entry" : "entries";
-                printError("OOPS!!! I skipped " + skippedLineCount + " corrupted data " + entryLabel + ".");
+                ui.printError("OOPS!!! I skipped " + skippedLineCount + " corrupted data " + entryLabel + ".");
             }
-            return tasks;
         } catch (IOException e) {
-            printError("OOPS!!! I couldn't load your saved tasks noob.");
-            return new ArrayList<>();
+            ui.printError("OOPS!!! I couldn't load your saved tasks noob.");
+            tasks = new TaskList();
         }
     }
-
-    /**
-     * Deletes a selected task from the list.
-     */
-    private static void deleteTask(String arguments, ArrayList<Task> tasks) {
-        if (arguments.isEmpty()) {
-            throw new IllegalArgumentException("Please provide a task number, for example: delete 1");
-        }
-        int taskIndex = Parser.parseTaskIndex(arguments, tasks.size());
-        Task removedTask = tasks.remove(taskIndex);
-        printDeletedTask(removedTask, tasks.size());
-    }
-
-    /**
-     * Updates a selected task only after validating its one-based number.
-     */
-    private static void updateTaskStatus(String commandWord, String arguments, ArrayList<Task> tasks) {
-        if (arguments.isEmpty()) {
-            throw new IllegalArgumentException("Please provide a task number, for example: "
-                    + commandWord.toLowerCase() + " 1");
-        }
-        int taskIndex = Parser.parseTaskIndex(arguments, tasks.size());
-        boolean shouldMarkAsDone = commandWord.equalsIgnoreCase("mark");
-        if (shouldMarkAsDone) {
-            tasks.get(taskIndex).markAsDone();
-        } else {
-            tasks.get(taskIndex).markAsNotDone();
-        }
-        printTaskStatus(tasks.get(taskIndex), taskIndex + 1, shouldMarkAsDone);
-    }
-
-    /**
-     * Displays the Dog banner and welcome message.
-     */
-    private static void printGreeting() {
-        String banner = " ____              \n"
-                + "|  _ \\  ___   __ _ \n"
-                + "| | | |/ _ \\ / _` |\n"
-                + "| |_| | (_) | (_| |\n"
-                + "|____/ \\___/ \\__, |\n"
-                + "             |___/ \n";
-        System.out.println(banner);
-        System.out.println("Woof! What can I do for you today?");
-    }
-
-    /**
-     * Displays all tasks with one-based numbers, or an empty-list message.
-     *
-     * @param tasks Tasks in their stored order.
-     */
-    private static void printTaskList(ArrayList<Task> tasks) {
-        if (tasks.isEmpty()) {
-            System.out.println("Your task list is empty :(");
-            return;
-        }
-        System.out.println(DIVIDER);
-        System.out.println("Here are the tasks in your list:");
-        for (int i = 0; i < tasks.size(); i++) {
-            System.out.println((i + 1) + "." + tasks.get(i));
-        }
-        System.out.println(DIVIDER);
-    }
-
-    /**
-     * Displays description matches in list order without changing the stored tasks.
-     * Result numbers are local to the search results.
-     */
-    private static void printMatchingTasks(String keyword, ArrayList<Task> tasks) {
-        if (keyword.isEmpty()) {
-            throw new IllegalArgumentException("Please provide a keyword, for example: find book");
-        }
-        String normalizedKeyword = keyword.toLowerCase(Locale.ROOT);
-        System.out.println(DIVIDER);
-        System.out.println("Here are the matching tasks in your list:");
-        int matchCount = 0;
-        for (Task task : tasks) {
-            if (task.getDescription().toLowerCase(Locale.ROOT).contains(normalizedKeyword)) {
-                matchCount++;
-                System.out.println(matchCount + "." + task);
-            }
-        }
-        if (matchCount == 0) {
-            System.out.println("No matching tasks found.");
-        }
-        System.out.println(DIVIDER);
-    }
-
-    /**
-     * Displays confirmation of a task's updated completion status.
-     *
-     * @param task Updated task.
-     * @param taskNumber One-based position in the full task list.
-     * @param isDone Whether the task was marked as done.
-     */
-    private static void printTaskStatus(Task task, int taskNumber, boolean isDone) {
-        String action = isDone ? "marked as done" : "marked as not done";
-        System.out.println("Task " + taskNumber + " has been " + action + ":");
-        System.out.println(task);
-    }
-
-    /**
-     * Displays the added task and the resulting task count.
-     *
-     * @param task Newly added task.
-     * @param taskCount Number of tasks after addition.
-     */
-    private static void printAddedTask(Task task, int taskCount) {
-        System.out.println(DIVIDER);
-        System.out.println("Woof! I've added this task:");
-        System.out.println("  " + task);
-        System.out.println("Now you have " + taskCount + " tasks in the list.");
-        System.out.println(DIVIDER);
-    }
-
-    /**
-     * Displays the removed task and the remaining task count.
-     *
-     * @param task Removed task.
-     * @param taskCount Number of tasks after deletion.
-     */
-    private static void printDeletedTask(Task task, int taskCount) {
-        System.out.println(DIVIDER);
-        System.out.println("Noted. I've removed this task:");
-        System.out.println("  " + task);
-        System.out.println("Now you have " + taskCount + " tasks in the list.");
-        System.out.println(DIVIDER);
-    }
-
-    /**
-     * Displays an error message between divider lines.
-     *
-     * @param message Error text to show.
-     */
-    private static void printError(String message) {
-        System.out.println(DIVIDER);
-        System.out.println(message);
-        System.out.println(DIVIDER);
-    }
-
 }

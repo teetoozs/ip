@@ -97,28 +97,28 @@ public class Storage {
         Task task;
         String description = decode(fields[2]);
         switch (fields[0]) {
-            case "T":
-                requireFieldCount(fields, 3);
-                task = new Todo(description);
-                break;
-            case "D":
-                requireFieldCount(fields, 4);
-                task = new Deadline(description, decode(fields[3]));
-                break;
-            case "E":
-                requireFieldCount(fields, 5);
-                task = new Event(description, decode(fields[3]), decode(fields[4]));
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown task type");
-            }
+        case "T":
+            requireFieldCount(fields, 3);
+            task = new Todo(description);
+            break;
+        case "D":
+            requireFieldCount(fields, 4);
+            task = new Deadline(description, decode(fields[3]));
+            break;
+        case "E":
+            requireFieldCount(fields, 5);
+            task = new Event(description, decode(fields[3]), decode(fields[4]));
+            break;
+        default:
+            throw new IllegalArgumentException("Unknown task type");
+        }
 
-            if (fields[1].equals("1")) {
-                task.markAsDone();
-            } else if (!fields[1].equals("0")) {
-                throw new IllegalArgumentException("Invalid task status");
-            }
-            return task;
+        if (fields[1].equals("1")) {
+            task.markAsDone();
+        } else if (!fields[1].equals("0")) {
+            throw new IllegalArgumentException("Invalid task status");
+        }
+        return task;
     }
 
     /**

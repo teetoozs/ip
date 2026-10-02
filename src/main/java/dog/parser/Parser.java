@@ -1,5 +1,7 @@
 package dog.parser;
 
+import java.util.Locale;
+
 import dog.task.Deadline;
 import dog.task.Event;
 import dog.task.Task;
@@ -10,11 +12,51 @@ import dog.task.Todo;
  */
 public final class Parser {
     private static final String TODO_ERROR = "OOPS!!! A todo needs a description leii. Woof!";
-    private static final String DEADLINE_ERROR = "OOPS!!! A deadline needs a description and follow this format: /by date or time. Woof!";
-    private static final String EVENT_ERROR = "OOPS!!! An event needs a description and timestamp, /from time, and /to time. Woof!";
+    private static final String DEADLINE_ERROR = "OOPS!!! A deadline needs a description and follow this format: "
+            + "/by date or time. Woof!";
+    private static final String EVENT_ERROR = "OOPS!!! An event needs a description and timestamp, "
+            + "/from time, and /to time. Woof!";
     private static final String UNKNOWN_COMMAND_ERROR = "OOPS!!! I don't know what that command means. WOOOOOOOOF!";
 
     private Parser() {
+    }
+
+    /**
+     * Returns the first word of a trimmed command.
+     *
+     * @param command Trimmed input.
+     * @return Command word, or an empty string for blank input.
+     */
+    public static String getCommandWord(String command) {
+        return command.split("\\s+", 2)[0];
+    }
+
+    /**
+     * Returns the trimmed text following the command word.
+     *
+     * @param command Trimmed input.
+     * @return Arguments, or an empty string if absent.
+     */
+    public static String getArguments(String command) {
+        String[] parts = command.split("\\s+", 2);
+        return parts.length == 2 ? parts[1].trim() : "";
+    }
+
+    /**
+     * Validates required task-number arguments and converts them to an index.
+     *
+     * @param commandWord Command used in the missing-number example.
+     * @param arguments Task-number text.
+     * @param taskCount Number of available tasks.
+     * @return Valid zero-based task index.
+     * @throws IllegalArgumentException If the number is missing, malformed, or out of range.
+     */
+    public static int parseTaskIndex(String commandWord, String arguments, int taskCount) {
+        if (arguments.isEmpty()) {
+            throw new IllegalArgumentException("Please provide a task number, for example: "
+                    + commandWord.toLowerCase(Locale.ROOT) + " 1");
+        }
+        return parseTaskIndex(arguments, taskCount);
     }
 
     /**

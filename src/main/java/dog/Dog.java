@@ -3,6 +3,7 @@ package dog;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Scanner;
 
 import dog.parser.Parser;
@@ -62,6 +63,10 @@ public class Dog {
         String[] commandParts = command.split("\\s+", 2);
         String commandWord = commandParts[0];
         String arguments = commandParts.length == 2 ? commandParts[1] : "";
+        if (commandWord.equalsIgnoreCase("find")) {
+            printMatchingTasks(arguments.trim(), tasks);
+            return;
+        }
         if (commandWord.equalsIgnoreCase("mark") || commandWord.equalsIgnoreCase("unmark")) {
             updateTaskStatus(commandWord, arguments, tasks);
             storage.saveTasks(tasks);
@@ -144,6 +149,30 @@ public class Dog {
         System.out.println("Here are the tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
             System.out.println((i + 1) + "." + tasks.get(i));
+        }
+        System.out.println(DIVIDER);
+    }
+
+    /**
+     * Displays description matches in list order without changing the stored tasks.
+     * Result numbers are local to the search results.
+     */
+    private static void printMatchingTasks(String keyword, ArrayList<Task> tasks) {
+        if (keyword.isEmpty()) {
+            throw new IllegalArgumentException("Please provide a keyword, for example: find book");
+        }
+        String normalizedKeyword = keyword.toLowerCase(Locale.ROOT);
+        System.out.println(DIVIDER);
+        System.out.println("Here are the matching tasks in your list:");
+        int matchCount = 0;
+        for (Task task : tasks) {
+            if (task.getDescription().toLowerCase(Locale.ROOT).contains(normalizedKeyword)) {
+                matchCount++;
+                System.out.println(matchCount + "." + task);
+            }
+        }
+        if (matchCount == 0) {
+            System.out.println("No matching tasks found.");
         }
         System.out.println(DIVIDER);
     }

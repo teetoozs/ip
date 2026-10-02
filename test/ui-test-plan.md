@@ -16,6 +16,65 @@ ideal grammar. Generated transcripts belong in ignored `_temp/`, not in commits.
   "startup": " ____              \n|  _ \\  ___   __ _ \n| | | |/ _ \\ / _` |\n| |_| | (_) | (_| |\n|____/ \\___/ \\__, |\n             |___/ \n\nWoof! What can I do for you today?\n",
   "cases": [
     {
+      "name": "Find tasks by description",
+      "aim": "Check empty lists, missing keywords, case-insensitive substrings and phrases, all task types, description-only matching, result numbering, and unchanged list state.",
+      "steps": [
+        {
+          "input": "find book",
+          "expected": "____________________________________________________________\nHere are the matching tasks in your list:\nNo matching tasks found.\n____________________________________________________________\n"
+        },
+        {
+          "input": "find   ",
+          "expected": "____________________________________________________________\nPlease provide a keyword, for example: find book\n____________________________________________________________\n"
+        },
+        {
+          "input": "todo walk dog",
+          "expected": "____________________________________________________________\nGot it. I've added this task:\n  [T][ ] walk dog\nNow you have 1 tasks in the list.\n____________________________________________________________\n"
+        },
+        {
+          "input": "todo read Book",
+          "expected": "____________________________________________________________\nGot it. I've added this task:\n  [T][ ] read Book\nNow you have 2 tasks in the list.\n____________________________________________________________\n"
+        },
+        {
+          "input": "deadline return book /by Sunday",
+          "expected": "____________________________________________________________\nGot it. I've added this task:\n  [D][ ] return book (by: Sunday)\nNow you have 3 tasks in the list.\n____________________________________________________________\n"
+        },
+        {
+          "input": "event book club /from Monday /to Tuesday",
+          "expected": "____________________________________________________________\nGot it. I've added this task:\n  [E][ ] book club (from: Monday to: Tuesday)\nNow you have 4 tasks in the list.\n____________________________________________________________\n"
+        },
+        {
+          "input": "mark 2",
+          "expected": "Task 2 has been marked as done:\n[T][X] read Book\n"
+        },
+        {
+          "input": "FIND BOO",
+          "expected": "____________________________________________________________\nHere are the matching tasks in your list:\n1.[T][X] read Book\n2.[D][ ] return book (by: Sunday)\n3.[E][ ] book club (from: Monday to: Tuesday)\n____________________________________________________________\n"
+        },
+        {
+          "input": "find read book",
+          "expected": "____________________________________________________________\nHere are the matching tasks in your list:\n1.[T][X] read Book\n____________________________________________________________\n"
+        },
+        {
+          "input": "find Sunday",
+          "expected": "____________________________________________________________\nHere are the matching tasks in your list:\nNo matching tasks found.\n____________________________________________________________\n"
+        },
+        {
+          "input": "find missing",
+          "expected": "____________________________________________________________\nHere are the matching tasks in your list:\nNo matching tasks found.\n____________________________________________________________\n"
+        },
+        {
+          "input": "list",
+          "expected": "____________________________________________________________\nHere are the tasks in your list:\n1.[T][ ] walk dog\n2.[T][X] read Book\n3.[D][ ] return book (by: Sunday)\n4.[E][ ] book club (from: Monday to: Tuesday)\n____________________________________________________________\n"
+        },
+        {
+          "input": "bye",
+          "expected": "Woof! See you again!\n",
+          "exit": true
+        }
+      ]
+    },
+    {
       "name": "Task types and completion",
       "aim": "Check typed task creation, free-form dates, numbered listing, and inherited completion behavior.",
       "steps": [

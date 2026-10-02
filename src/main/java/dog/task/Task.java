@@ -40,14 +40,29 @@ public class Task {
         return isDone ? "X" : " ";
     }
 
+    /**
+     * Returns the task description as entered by the user.
+     *
+     * @return Description without status or type markers.
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Returns whether this task is completed.
+     *
+     * @return True if the task is marked as done.
+     */
     public boolean isDone() {
         return isDone;
     }
 
+    /**
+     * Returns the completion marker and description for display.
+     *
+     * @return Task text beginning with its completion marker.
+     */
     @Override
     public String toString() {
         return "[" + getStatusIcon() + "] " + description;

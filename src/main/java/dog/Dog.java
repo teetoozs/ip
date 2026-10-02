@@ -84,6 +84,12 @@ public class Dog {
         printAddedTask(task, tasks.size());
     }
 
+    /**
+     * Loads saved tasks, reporting skipped records or a read failure.
+     *
+     * @param storage Storage to read.
+     * @return Loaded tasks, or an empty list if reading fails.
+     */
     private static ArrayList<Task> loadTasks(Storage storage) {
         try {
             ArrayList<Task> tasks = storage.loadTasks();
@@ -94,7 +100,7 @@ public class Dog {
             }
             return tasks;
         } catch (IOException e) {
-            printError("OOPS!!! I couldn't load your saved tasks.");
+            printError("OOPS!!! I couldn't load your saved tasks noob.");
             return new ArrayList<>();
         }
     }
@@ -129,6 +135,9 @@ public class Dog {
         printTaskStatus(tasks.get(taskIndex), taskIndex + 1, shouldMarkAsDone);
     }
 
+    /**
+     * Displays the Dog banner and welcome message.
+     */
     private static void printGreeting() {
         String banner = " ____              \n"
                 + "|  _ \\  ___   __ _ \n"
@@ -140,6 +149,11 @@ public class Dog {
         System.out.println("Woof! What can I do for you today?");
     }
 
+    /**
+     * Displays all tasks with one-based numbers, or an empty-list message.
+     *
+     * @param tasks Tasks in their stored order.
+     */
     private static void printTaskList(ArrayList<Task> tasks) {
         if (tasks.isEmpty()) {
             System.out.println("Your task list is empty :(");
@@ -177,20 +191,39 @@ public class Dog {
         System.out.println(DIVIDER);
     }
 
+    /**
+     * Displays confirmation of a task's updated completion status.
+     *
+     * @param task Updated task.
+     * @param taskNumber One-based position in the full task list.
+     * @param isDone Whether the task was marked as done.
+     */
     private static void printTaskStatus(Task task, int taskNumber, boolean isDone) {
         String action = isDone ? "marked as done" : "marked as not done";
         System.out.println("Task " + taskNumber + " has been " + action + ":");
         System.out.println(task);
     }
 
+    /**
+     * Displays the added task and the resulting task count.
+     *
+     * @param task Newly added task.
+     * @param taskCount Number of tasks after addition.
+     */
     private static void printAddedTask(Task task, int taskCount) {
         System.out.println(DIVIDER);
-        System.out.println("Got it. I've added this task:");
+        System.out.println("Woof! I've added this task:");
         System.out.println("  " + task);
         System.out.println("Now you have " + taskCount + " tasks in the list.");
         System.out.println(DIVIDER);
     }
 
+    /**
+     * Displays the removed task and the remaining task count.
+     *
+     * @param task Removed task.
+     * @param taskCount Number of tasks after deletion.
+     */
     private static void printDeletedTask(Task task, int taskCount) {
         System.out.println(DIVIDER);
         System.out.println("Noted. I've removed this task:");
@@ -199,6 +232,11 @@ public class Dog {
         System.out.println(DIVIDER);
     }
 
+    /**
+     * Displays an error message between divider lines.
+     *
+     * @param message Error text to show.
+     */
     private static void printError(String message) {
         System.out.println(DIVIDER);
         System.out.println(message);

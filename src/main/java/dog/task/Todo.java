@@ -14,6 +14,11 @@ public class Todo extends Task {
         super(description);
     }
 
+    /**
+     * Returns the todo type marker, status, and description.
+     *
+     * @return Display text beginning with {@code [T]}.
+     */
     @Override
     public String toString() {
         return "[T]" + super.toString();

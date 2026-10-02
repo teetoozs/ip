@@ -17,10 +17,20 @@ public class Deadline extends Task {
         this.by = by;
     }
 
+    /**
+     * Returns the due date or time as free-form text.
+     *
+     * @return Due date or time supplied by the user.
+     */
     public String getBy() {
         return by;
     }
 
+    /**
+     * Returns the deadline type, status, description, and due time.
+     *
+     * @return Display text beginning with {@code [D]}.
+     */
     @Override
     public String toString() {
         return "[D]" + super.toString() + " (by: " + by + ")";

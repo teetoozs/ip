@@ -29,19 +29,19 @@ ideal grammar. Generated transcripts belong in ignored `_temp/`, not in commits.
         },
         {
           "input": "todo walk dog",
-          "expected": "____________________________________________________________\nGot it. I've added this task:\n  [T][ ] walk dog\nNow you have 1 tasks in the list.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nWoof! I've added this task:\n  [T][ ] walk dog\nNow you have 1 tasks in the list.\n____________________________________________________________\n"
         },
         {
           "input": "todo read Book",
-          "expected": "____________________________________________________________\nGot it. I've added this task:\n  [T][ ] read Book\nNow you have 2 tasks in the list.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nWoof! I've added this task:\n  [T][ ] read Book\nNow you have 2 tasks in the list.\n____________________________________________________________\n"
         },
         {
           "input": "deadline return book /by Sunday",
-          "expected": "____________________________________________________________\nGot it. I've added this task:\n  [D][ ] return book (by: Sunday)\nNow you have 3 tasks in the list.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nWoof! I've added this task:\n  [D][ ] return book (by: Sunday)\nNow you have 3 tasks in the list.\n____________________________________________________________\n"
         },
         {
           "input": "event book club /from Monday /to Tuesday",
-          "expected": "____________________________________________________________\nGot it. I've added this task:\n  [E][ ] book club (from: Monday to: Tuesday)\nNow you have 4 tasks in the list.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nWoof! I've added this task:\n  [E][ ] book club (from: Monday to: Tuesday)\nNow you have 4 tasks in the list.\n____________________________________________________________\n"
         },
         {
           "input": "mark 2",
@@ -80,15 +80,15 @@ ideal grammar. Generated transcripts belong in ignored `_temp/`, not in commits.
       "steps": [
         {
           "input": "todo borrow book",
-          "expected": "____________________________________________________________\nGot it. I've added this task:\n  [T][ ] borrow book\nNow you have 1 tasks in the list.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nWoof! I've added this task:\n  [T][ ] borrow book\nNow you have 1 tasks in the list.\n____________________________________________________________\n"
         },
         {
           "input": "deadline homework /by no idea :-p",
-          "expected": "____________________________________________________________\nGot it. I've added this task:\n  [D][ ] homework (by: no idea :-p)\nNow you have 2 tasks in the list.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nWoof! I've added this task:\n  [D][ ] homework (by: no idea :-p)\nNow you have 2 tasks in the list.\n____________________________________________________________\n"
         },
         {
           "input": "event meeting /from Mon 2pm /to 4pm",
-          "expected": "____________________________________________________________\nGot it. I've added this task:\n  [E][ ] meeting (from: Mon 2pm to: 4pm)\nNow you have 3 tasks in the list.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nWoof! I've added this task:\n  [E][ ] meeting (from: Mon 2pm to: 4pm)\nNow you have 3 tasks in the list.\n____________________________________________________________\n"
         },
         {
           "input": "mark 1",
@@ -131,15 +131,15 @@ ideal grammar. Generated transcripts belong in ignored `_temp/`, not in commits.
       "steps": [
         {
           "input": "todo",
-          "expected": "____________________________________________________________\nOOPS!!! A todo needs a description.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nOOPS!!! A todo needs a description leii. Woof!\n____________________________________________________________\n"
         },
         {
           "input": "deadline book /by",
-          "expected": "____________________________________________________________\nOOPS!!! A deadline needs a description and a /by date or time.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nOOPS!!! A deadline needs a description and follow this format: /by date or time. Woof!\n____________________________________________________________\n"
         },
         {
           "input": "event meeting /from Monday",
-          "expected": "____________________________________________________________\nOOPS!!! An event needs a description, /from time, and /to time.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nOOPS!!! An event needs a description and timestamp, /from time, and /to time. Woof!\n____________________________________________________________\n"
         },
         {
           "input": "mark",
@@ -147,11 +147,11 @@ ideal grammar. Generated transcripts belong in ignored `_temp/`, not in commits.
         },
         {
           "input": "mark abc",
-          "expected": "____________________________________________________________\nPlease provide a valid task number.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nPlease provide a valid task number if not i will bite\n____________________________________________________________\n"
         },
         {
           "input": "unmark 0",
-          "expected": "____________________________________________________________\nThat task number does not exist.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nThat task number does not exist. *Growl*\n____________________________________________________________\n"
         },
         {
           "input": "delete",
@@ -159,11 +159,11 @@ ideal grammar. Generated transcripts belong in ignored `_temp/`, not in commits.
         },
         {
           "input": "delete 1",
-          "expected": "____________________________________________________________\nThat task number does not exist.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nThat task number does not exist. *Growl*\n____________________________________________________________\n"
         },
         {
           "input": "blah",
-          "expected": "____________________________________________________________\nOOPS!!! I don't know what that command means.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nOOPS!!! I don't know what that command means. WOOOOOOOOF!\n____________________________________________________________\n"
         },
         {
           "input": "list",
@@ -186,7 +186,7 @@ ideal grammar. Generated transcripts belong in ignored `_temp/`, not in commits.
         },
         {
           "input": "TODO walk dog",
-          "expected": "____________________________________________________________\nGot it. I've added this task:\n  [T][ ] walk dog\nNow you have 1 tasks in the list.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nWoof! I've added this task:\n  [T][ ] walk dog\nNow you have 1 tasks in the list.\n____________________________________________________________\n"
         },
         {
           "input": "MARK 1",
@@ -209,27 +209,27 @@ ideal grammar. Generated transcripts belong in ignored `_temp/`, not in commits.
       "steps": [
         {
           "input": "deadline /by Sunday",
-          "expected": "____________________________________________________________\nOOPS!!! A deadline needs a description and a /by date or time.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nOOPS!!! A deadline needs a description and follow this format: /by date or time. Woof!\n____________________________________________________________\n"
         },
         {
           "input": "event /from Monday /to Tuesday",
-          "expected": "____________________________________________________________\nOOPS!!! An event needs a description, /from time, and /to time.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nOOPS!!! An event needs a description and timestamp, /from time, and /to time. Woof!\n____________________________________________________________\n"
         },
         {
           "input": "event meeting /from Monday /to",
-          "expected": "____________________________________________________________\nOOPS!!! An event needs a description, /from time, and /to time.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nOOPS!!! An event needs a description and timestamp, /from time, and /to time. Woof!\n____________________________________________________________\n"
         },
         {
           "input": "event meeting /to Tuesday /from Monday",
-          "expected": "____________________________________________________________\nOOPS!!! An event needs a description, /from time, and /to time.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nOOPS!!! An event needs a description and timestamp, /from time, and /to time. Woof!\n____________________________________________________________\n"
         },
         {
           "input": "deadline report /by Sunday /by later",
-          "expected": "____________________________________________________________\nGot it. I've added this task:\n  [D][ ] report (by: Sunday /by later)\nNow you have 1 tasks in the list.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nWoof! I've added this task:\n  [D][ ] report (by: Sunday /by later)\nNow you have 1 tasks in the list.\n____________________________________________________________\n"
         },
         {
           "input": "event conference /from 4/10/2019 /to 11/10/2019",
-          "expected": "____________________________________________________________\nGot it. I've added this task:\n  [E][ ] conference (from: 4/10/2019 to: 11/10/2019)\nNow you have 2 tasks in the list.\n____________________________________________________________\n"
+          "expected": "____________________________________________________________\nWoof! I've added this task:\n  [E][ ] conference (from: 4/10/2019 to: 11/10/2019)\nNow you have 2 tasks in the list.\n____________________________________________________________\n"
         },
         {
           "input": "list",
